@@ -1,80 +1,64 @@
 # Keystone K8s Project: Production-Grade Private Cloud
 
 ## Project Overview
-This repository documents the implementation of a production-grade private cloud environment. I engineered this infrastructure from the ground up to demonstrate advanced Linux system administration, storage orchestration, and virtualized networking. 
+This repository documents the implementation of a production-grade private cloud environment hosted on high-performance bare-metal hardware. I designed this infrastructure to demonstrate advanced Linux system administration, security hardening, and modern cryptographic standards.
 
-My approach utilizes a "no-bloat" infrastructure-as-code methodology, transitioning from raw hardware to a hardened, quantum-resistant Kubernetes environment.
+The architecture transitions from raw virtualized resources to a hardened, quantum-resistant Kubernetes environment.
 
-## Phase I: Hybrid Infrastructure Layer
+## Phase I: Infrastructure & Build Environment
 
-### 1. Bare-Metal Provisioning Host
-* **Model:** Dell Latitude E5570
-* **Role:** Dedicated Bare-Metal Hypervisor
-* **Processor:** Intel Core i7-6820HQ (4 Cores / 8 Threads)
-* **Memory:** 24GiB DDR4
-* **Hypervisor:** KVM/libvirt on Ubuntu 24.04 LTS
+### High-Performance Control Station (The Engine)
+* **Hardware:** ASRock B860 Pro-A
+* **Processor:** Intel Core Ultra 7 265KF (20 Cores / 20 Threads)
+* **Memory:** 64.0 GiB DDR5
+* **Host OS:** Ubuntu 24.04.4 LTS
+* **Virtualization:** KVM/libvirt
+* **Guest OS:** CentOS 9 Stream
+* **Resource Optimization:** I allocated **12 vCPUs** to the primary lab node to facilitate high-concurrency cryptographic builds.
 
-### 2. High-Performance Build & Control Station
-* **Hardware:** ASRock B860 Pro-A | Intel Core Ultra 7 265KF (20 Cores / 20 Threads)
-* **Role:** Parallelized build engine and secure SSH gateway.
-* **Optimization:** I leveraged this 20-thread architecture to execute high-intensity cryptographic compilations for the cluster nodes.
-
----
-
-## Phase II: Storage & Network Orchestration
-
-### Storage Virtualization (LVM)
-I utilized **Logical Volume Management (LVM)** to provide a flexible and high-performance storage backend. This allows for dynamic resizing of node storage without downtime.
-
-1. **Initialize Physical Volume:**
-   \`\`\`bash
-   sudo pvcreate /dev/sda3
-   \`\`\`
-2. **Create Infrastructure Volume Group:**
-   \`\`\`bash
-   sudo vgcreate vg_infrastructure /dev/sda3
-   \`\`\`
-3. **Provision Logical Volumes:**
-   I allocated 50GiB per node to ensure sufficient overhead for container images and persistent volumes.
+### Host-Side Storage & Volume Mapping
+I verified the physical storage paths on the **Ultra 7** host to ensure optimal I/O throughput:
+* **Storage Pool:** `images` (Mapped to the NVMe-backed LVM root partition)
+* **Physical Path:** `/var/lib/libvirt/images`
+* **Active Disk:** `centos9-stream.qcow2`
+* **Provisioning Source:** `CentOS-Stream-9-latest-x86_64-dvd1.iso`
 
 ---
 
-## Phase III: Security Hardening & Post-Quantum Integration
+## Phase II: Security Hardening & Post-Quantum Fusion
 
-### Post-Quantum Cryptography (PQC) Fusion
-To secure the cluster against future quantum threats, I integrated the **Open Quantum Safe (OQS)** library into the CentOS 9 Stream environment.
+### Post-Quantum Cryptography (PQC) Integration
+To secure the cluster against future quantum threats, I integrated the **Open Quantum Safe (OQS)** library into the environment.
 
-* **Implementation:** I compiled **liboqs 0.15.0** from source, utilizing **12 virtualized threads** of the Ultra 7 processor to optimize the build.
-* **Algorithm Verification:** I successfully verified the **ML-KEM-768** (NIST-standardized Kyber) handshake, ensuring the infrastructure is resistant to Shor's algorithm-based attacks.
+* **Implementation:** I compiled **liboqs 0.15.0** from source, utilizing the **12-thread parallel processing** capabilities of the Ultra 7 via the Ninja build system.
+* **Algorithm Verification:** I successfully verified the **ML-KEM-768** (NIST-standardized Kyber) handshake, confirming the system's ability to perform quantum-resistant key encapsulation.
 * **System Integration:** Full system-wide library availability in `/usr/local/lib64` via `ldconfig`.
 
 ### SELinux Mandatory Access Control (MAC)
-I implemented strict SELinux policies to confine web services and sensitive directories. I transitioned custom web roots to the `httpd_sys_content_t` type and ensured policy persistence using `semanage` and `restorecon`.
+I implemented hardening for custom service directories by configuring SELinux type enforcement. I transitioned custom web roots to the `httpd_sys_content_t` context and ensured policy persistence using `semanage` and `restorecon` to mitigate unauthorized lateral movement.
+
+---
+
+## Phase III: Network & Storage (In Progress)
+
+### Network Architecture
+I implemented a static IP schema to ensure predictable node communication and cluster stability. 
+* **Control Plane IP:** 192.168.122.240
+* **Status:** Connectivity verified via SSH and PQC Handshake.
+
+### Storage Strategy
+* **LVM Orchestration:** Planned implementation of Logical Volume Management (LVM) to provide a flexible storage backend for Kubernetes PersistentVolumes (PVs).
 
 ---
 
 ## Current Infrastructure Status
 
-| Node Name | Role | OS | IP Address | Status |
+| Component | Role | OS | Status | Verified Tech |
 | :--- | :--- | :--- | :--- | :--- |
-| **k8s-control** | Control Plane | CentOS 9 Stream | 192.168.0.50 | **Hardened** |
-| **k8s-worker-1** | Worker | CentOS 9 Stream | 192.168.0.60 | **Running** |
-| **k8s-worker-2** | Worker | CentOS 9 Stream | 192.168.0.61 | **Running** |
+| **k8s-control** | Control Plane | CentOS 9 | **Hardened** | ML-KEM-768 / SELinux |
+| **Ultra7 Host** | Hypervisor | Ubuntu 24.04 | **Active** | KVM / libvirt |
 
 ---
 
 ### Next Step
-I am currently transitioning to the **CKA Orchestration Layer**, where I will bootstrap the cluster using `kubeadm` and implement CNI-based networking.
-
-### Storage Volume Mapping
-I have verified the physical storage paths on the **Ultra7** host to ensure optimal I/O throughput:
-* **Storage Pool:** `images`
-* **Physical Path:** `/var/lib/libvirt/images`
-* **Active Disk:** `centos9-stream.qcow2` (50GB Sparse)
-* **Provisioning Source:** `CentOS-Stream-9-latest-x86_64-dvd1.iso`
-
-**Host-Side Volume Verification:**
-\`\`\`bash
-# Confirming volume mapping from Ultra7 host
-sudo virsh vol-list images
-\`\`\`
+I am currently transitioning to **Lab 20 (Manage Partitions and Swap Space)** to build out the LVM storage layer and prepare for the **CKA Orchestration Layer**.
