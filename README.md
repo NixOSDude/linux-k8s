@@ -1,9 +1,7 @@
-# Keystone K8s Project: Production-Grade Private Cloud
+# Keystone Project: Hardened Private Cloud Infrastructure
 
 ## Project Overview
-This repository documents the implementation of a production-grade private cloud environment hosted on high-performance bare-metal hardware. I designed this infrastructure to demonstrate advanced Linux system administration, security hardening, and modern cryptographic standards.
-
-The architecture transitions from raw virtualized resources to a hardened, quantum-resistant Kubernetes environment.
+This repository documents the implementation of a production-grade infrastructure foundation hosted on high-performance bare-metal hardware. I engineered this environment to demonstrate advanced Linux system administration, proactive security hardening, and modern cryptographic standards.
 
 ## Phase I: Infrastructure & Build Environment
 
@@ -12,14 +10,12 @@ The architecture transitions from raw virtualized resources to a hardened, quant
 * **Processor:** Intel Core Ultra 7 265KF (20 Cores / 20 Threads)
 * **Memory:** 64.0 GiB DDR5
 * **Host OS:** Ubuntu 24.04.4 LTS
-* **Virtualization:** KVM/libvirt
-* **Guest OS:** CentOS 9 Stream
-* **Resource Optimization:** I allocated **12 vCPUs** to the primary lab node to facilitate high-concurrency cryptographic builds.
+* **Virtualization:** KVM/libvirt (CentOS 9 Stream Guest)
+* **Resource Optimization:** I allocated **12 vCPUs** to the primary node to facilitate high-concurrency cryptographic builds and system stress testing.
 
 ### Host-Side Storage & Volume Mapping
 I verified the physical storage paths on the **Ultra 7** host to ensure optimal I/O throughput:
 * **Storage Pool:** `images` (Mapped to the NVMe-backed LVM root partition)
-* **Physical Path:** `/var/lib/libvirt/images`
 * **Active Disk:** `centos9-stream.qcow2`
 * **Provisioning Source:** `CentOS-Stream-9-latest-x86_64-dvd1.iso`
 
@@ -28,9 +24,9 @@ I verified the physical storage paths on the **Ultra 7** host to ensure optimal 
 ## Phase II: Security Hardening & Post-Quantum Fusion
 
 ### Post-Quantum Cryptography (PQC) Integration
-To secure the cluster against future quantum threats, I integrated the **Open Quantum Safe (OQS)** library into the environment.
+To secure the infrastructure against future quantum threats, I integrated the **Open Quantum Safe (OQS)** library into the environment.
 
-* **Implementation:** I compiled **liboqs 0.15.0** from source, utilizing the **12-thread parallel processing** capabilities of the Ultra 7 via the Ninja build system.
+* **Implementation:** I compiled **liboqs 0.15.0** from source, utilizing the **12-thread parallel processing** capabilities of the Ultra 7.
 * **Algorithm Verification:** I successfully verified the **ML-KEM-768** (NIST-standardized Kyber) handshake, confirming the system's ability to perform quantum-resistant key encapsulation.
 * **System Integration:** Full system-wide library availability in `/usr/local/lib64` via `ldconfig`.
 
@@ -39,26 +35,9 @@ I implemented hardening for custom service directories by configuring SELinux ty
 
 ---
 
-## Phase III: Network & Storage (In Progress)
-
-### Network Architecture
-I implemented a static IP schema to ensure predictable node communication and cluster stability. 
-* **Control Plane IP:** 192.168.122.240
-* **Status:** Connectivity verified via SSH and PQC Handshake.
-
-### Storage Strategy
-* **LVM Orchestration:** Planned implementation of Logical Volume Management (LVM) to provide a flexible storage backend for Kubernetes PersistentVolumes (PVs).
-
----
-
 ## Current Infrastructure Status
 
 | Component | Role | OS | Status | Verified Tech |
 | :--- | :--- | :--- | :--- | :--- |
-| **k8s-control** | Control Plane | CentOS 9 | **Hardened** | ML-KEM-768 / SELinux |
-| **Ultra7 Host** | Hypervisor | Ubuntu 24.04 | **Active** | KVM / libvirt |
-
----
-
-### Next Step
-I am currently transitioning to **Lab 20 (Manage Partitions and Swap Space)** to build out the LVM storage layer and prepare for the **CKA Orchestration Layer**.
+| **Infrastructure Node 1** | Primary Host | CentOS 9 | **Hardened** | ML-KEM-768 / SELinux |
+| **Ultra7 Host** | Bare-Metal Hypervisor | Ubuntu 24.04 | **Active** | KVM / libvirt |
