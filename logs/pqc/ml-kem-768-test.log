@@ -1,0 +1,20 @@
+Testing KEM algorithms using liboqs version 0.15.0
+Configuration info
+==================
+Target platform:  x86_64-Linux-5.14.0-687.el9.x86_64
+Compiler:         gcc (11.5.0)
+Compile options:  [-Wa,--noexecstack;-O3;-fomit-frame-pointer;-fdata-sections;-ffunction-sections;-Wl,--gc-sections;-Wbad-function-cast]
+OQS version:      0.15.0 (major: 0, minor: 15, patch: 0)
+Git commit:       ab0e07c3eead79aff5ce800179f7b6ac15fdd1de
+OpenSSL enabled:  Yes (OpenSSL 3.5.5 27 Jan 2026)
+AES:              NI
+SHA-2:            OpenSSL
+SHA-3:            AVX2
+OQS build flags:  OQS_DIST_BUILD OQS_LIBJADE_BUILD OQS_OPT_TARGET=generic CMAKE_BUILD_TYPE=Release 
+CPU exts active:  ADX AES AVX AVX2 BMI1 BMI2 PCLMULQDQ POPCNT SSE SSE2 SSE3
+================================================================================
+sample computation for KEM ML-KEM-768
+Version source: FIPS203
+================================================================================
+shared secrets are equal
+shared secrets are equal
