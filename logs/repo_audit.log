@@ -1,0 +1,8 @@
+repo id             repo name
+appstream           CentOS Stream 9 - AppStream
+baseos              CentOS Stream 9 - BaseOS
+crb                 CentOS Stream 9 - CRB
+epel                Extra Packages for Enterprise Linux 9 - x86_64
+epel-cisco-openh264 Extra Packages for Enterprise Linux 9 openh264 (From Cisco) - x86_64
+epel-next           Extra Packages for Enterprise Linux 9 - Next - x86_64
+extras-common       CentOS Stream 9 - Extras packages
