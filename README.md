@@ -65,3 +65,16 @@ I implemented strict SELinux policies to confine web services and sensitive dire
 
 ### Next Step
 I am currently transitioning to the **CKA Orchestration Layer**, where I will bootstrap the cluster using `kubeadm` and implement CNI-based networking.
+
+### Storage Volume Mapping
+I have verified the physical storage paths on the **Ultra7** host to ensure optimal I/O throughput:
+* **Storage Pool:** `images`
+* **Physical Path:** `/var/lib/libvirt/images`
+* **Active Disk:** `centos9-stream.qcow2` (50GB Sparse)
+* **Provisioning Source:** `CentOS-Stream-9-latest-x86_64-dvd1.iso`
+
+**Host-Side Volume Verification:**
+\`\`\`bash
+# Confirming volume mapping from Ultra7 host
+sudo virsh vol-list images
+\`\`\`
