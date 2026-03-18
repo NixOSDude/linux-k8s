@@ -1,76 +1,67 @@
 # Keystone K8s Project: Production-Grade Private Cloud
 
 ## Project Overview
-This repository documents the implementation of a production-grade private cloud environment hosted on bare-metal hardware. I designed this infrastructure to demonstrate advanced Linux system administration, storage orchestration, and virtualized networking. 
+This repository documents the implementation of a production-grade private cloud environment. I engineered this infrastructure from the ground up to demonstrate advanced Linux system administration, storage orchestration, and virtualized networking. 
 
-The goal is to move from raw hardware to a fully functional Kubernetes cluster using a "no-bloat" infrastructure-as-code approach.
+My approach utilizes a "no-bloat" infrastructure-as-code methodology, transitioning from raw hardware to a hardened, quantum-resistant Kubernetes environment.
 
-## Phase I: Bare-Metal Infrastructure Layer
+## Phase I: Hybrid Infrastructure Layer
 
-### Host Specifications
+### 1. Bare-Metal Provisioning Host
 * **Model:** Dell Latitude E5570
+* **Role:** Dedicated Bare-Metal Hypervisor
 * **Processor:** Intel Core i7-6820HQ (4 Cores / 8 Threads)
-* **Memory:** 24GiB DDR4 (16GiB + 8GiB)
-* **Storage:** 1TB Western Digital SATA SSD
-* **Hypervisor:** KVM/libvirt on Ubuntu 22.04 LTS
+* **Memory:** 24GiB DDR4
+* **Hypervisor:** KVM/libvirt on Ubuntu 24.04 LTS
 
-### Storage Orchestration (LVM)
-I utilized **Logical Volume Management (LVM)** to provide a flexible and high-performance storage backend for the cluster nodes.
-
-1. **Initialize Physical Volume:**
-   ```bash
-   sudo pvcreate /dev/sda3
-   ```
-2. **Create Volume Group:**
-   ```bash
-   sudo vgcreate vg_infrastructure /dev/sda3
-   ```
-3. **Provision Logical Volumes:**
-   I allocated 50GiB per node to ensure sufficient overhead for container images and persistent volumes.
-   ```bash
-   sudo lvcreate -L 50G -n lv_k8s_control_plane vg_infrastructure
-   sudo lvcreate -L 50G -n lv_k8s_worker_1 vg_infrastructure
-   sudo lvcreate -L 50G -n lv_k8s_worker_2 vg_infrastructure
-   ```
-
-### Network Architecture
-I implemented a static IP schema to ensure predictable node communication and cluster stability. I used **Netplan** to bridge the virtual interfaces to the physical network.
-
-**Configuration:** `/etc/netplan/00-installer-config.yaml`
-```yaml
-network:
-  version: 2
-  ethernets:
-    enp0s31f6:
-      dhcp4: no
-      addresses: [192.168.0.100/24]
-      routes:
-        - to: default
-          via: 192.168.0.1
-      nameservers:
-        addresses: [8.8.8.8, 1.1.1.1]
-```
+### 2. High-Performance Build & Control Station
+* **Hardware:** ASRock B860 Pro-A | Intel Core Ultra 7 265KF (20 Cores / 20 Threads)
+* **Role:** Parallelized build engine and secure SSH gateway.
+* **Optimization:** I leveraged this 20-thread architecture to execute high-intensity cryptographic compilations for the cluster nodes.
 
 ---
 
-## Phase II: Automated Node Provisioning
-To streamline the deployment of the worker nodes, I used **virt-customize** to perform "offline surgery" on the VM disk images. This allows for immediate identity assignment (hostname and networking) without manual console intervention.
+## Phase II: Storage & Network Orchestration
 
-### Injection Workflow
-I used a Bash-driven automation pattern to inject specific Netplan configurations and set hostnames:
+### Storage Virtualization (LVM)
+I utilized **Logical Volume Management (LVM)** to provide a flexible and high-performance storage backend. This allows for dynamic resizing of node storage without downtime.
 
-```bash
-sudo virt-customize -d k8s-worker-2 \
-  --hostname k8s-worker-2 \
-  --upload worker2-net.yaml:/etc/netplan/00-installer-config.yaml
-```
+1. **Initialize Physical Volume:**
+   \`\`\`bash
+   sudo pvcreate /dev/sda3
+   \`\`\`
+2. **Create Infrastructure Volume Group:**
+   \`\`\`bash
+   sudo vgcreate vg_infrastructure /dev/sda3
+   \`\`\`
+3. **Provision Logical Volumes:**
+   I allocated 50GiB per node to ensure sufficient overhead for container images and persistent volumes.
 
-## Current Cluster Status
-I have successfully provisioned and verified the following nodes:
+---
 
-| Node Name | Role | IP Address | Status |
-| :--- | :--- | :--- | :--- |
-| k8s-control-plane | Control Plane | 192.168.0.50 | Running |
-| k8s-worker-1 | Worker | 192.168.0.60 | Running |
-| k8s-worker-2 | Worker | 192.168.0.61 | Running |
+## Phase III: Security Hardening & Post-Quantum Integration
 
+### Post-Quantum Cryptography (PQC) Fusion
+To secure the cluster against future quantum threats, I integrated the **Open Quantum Safe (OQS)** library into the CentOS 9 Stream environment.
+
+* **Implementation:** I compiled **liboqs 0.15.0** from source, utilizing **12 virtualized threads** of the Ultra 7 processor to optimize the build.
+* **Algorithm Verification:** I successfully verified the **ML-KEM-768** (NIST-standardized Kyber) handshake, ensuring the infrastructure is resistant to Shor's algorithm-based attacks.
+* **System Integration:** Full system-wide library availability in `/usr/local/lib64` via `ldconfig`.
+
+### SELinux Mandatory Access Control (MAC)
+I implemented strict SELinux policies to confine web services and sensitive directories. I transitioned custom web roots to the `httpd_sys_content_t` type and ensured policy persistence using `semanage` and `restorecon`.
+
+---
+
+## Current Infrastructure Status
+
+| Node Name | Role | OS | IP Address | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **k8s-control** | Control Plane | CentOS 9 Stream | 192.168.0.50 | **Hardened** |
+| **k8s-worker-1** | Worker | CentOS 9 Stream | 192.168.0.60 | **Running** |
+| **k8s-worker-2** | Worker | CentOS 9 Stream | 192.168.0.61 | **Running** |
+
+---
+
+### Next Step
+I am currently transitioning to the **CKA Orchestration Layer**, where I will bootstrap the cluster using `kubeadm` and implement CNI-based networking.
