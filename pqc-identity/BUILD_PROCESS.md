@@ -15,14 +15,14 @@ To enable NIST Post-Quantum Cryptography (PQC) standards (ML-KEM and ML-DSA) on 
 
 ### 1. Provisioning Build Dependencies
 I began by installing the necessary development headers and build tools via RHEL's native package manager (`dnf`).
-\```bash
+```bash
 sudo dnf groupinstall "Development Tools" -y
 sudo dnf install cmake ninja-build openssl-devel -y
-\```
+```
 
 ### 2. Compiling the Core Quantum-Safe Library (`liboqs`)
 I cloned the upstream `liboqs` repository and configured the build system. Using Ninja, I compiled the library from source. Because RHEL 9 does not automatically track custom library paths by default, I explicitly created a configuration file in `/etc/ld.so.conf.d/` for the dynamic linker to locate `liboqs.so.9` before rebuilding the shared library cache.
-\```bash
+```bash
 git clone [https://github.com/open-quantum-safe/liboqs.git](https://github.com/open-quantum-safe/liboqs.git)
 cd liboqs
 mkdir build && cd build
@@ -33,22 +33,22 @@ sudo ninja install
 # Configure dynamic linker for the custom liboqs library path
 echo "/usr/local/lib64" | sudo tee /etc/ld.so.conf.d/liboqs.conf
 sudo ldconfig
-\```
+```
 
 ### 3. Compiling the OpenSSL Provider (`oqs-provider`)
 With the core C library installed and explicitly cached, I built the OpenSSL provider wrapper to expose these lattice-based algorithms to standard system binaries.
-\```bash
+```bash
 git clone [https://github.com/open-quantum-safe/oqs-provider.git](https://github.com/open-quantum-safe/oqs-provider.git)
 cd oqs-provider
 mkdir build && cd build
 cmake -DOPENSSL_ROOT_DIR=/usr -G"Ninja" ..
 ninja -j4
 sudo make install
-\```
+```
 
 ### 4. OpenSSL Subsystem Integration
 To complete the build process, I modified the system's OpenSSL configuration to dynamically load the newly compiled provider, verifying success with the `openssl list -providers` command.
-\```bash
+```bash
 # Linked the compiled oqsprovider.so into the OpenSSL modules directory
 # Modified openssl.cnf to activate the 'oqsprovider' globally
-\```
+```
