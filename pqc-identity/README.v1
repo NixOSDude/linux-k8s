@@ -1,0 +1,36 @@
+# Keystone Project: Hardened Private Cloud Infrastructure
+
+## Project Overview
+This repository documents the implementation of a production-grade infrastructure foundation hosted on a dedicated **Dell Latitude E5570** bare-metal server running **RHEL 9**. I engineered this environment to demonstrate advanced Linux system administration and the practical application of **NIST Post-Quantum Cryptographic (PQC)** standards.
+
+## Methodology: Discovery & Implementation
+My implementation followed a documentation-driven, iterative approach to integrate cutting-edge cryptographic providers:
+
+* **Documentation-First Discovery:** I utilized native Linux `man` pages and OpenSSL `help` flags to navigate the complex sub-command structures required for the OQS (Open Quantum Safe) provider. 📖
+* **Iterative Command Refinement:** Through a cycle of trial and verification, I narrowed down the precise syntax for generating Lattice-based keys and certificates, ensuring full compatibility with RHEL 9's security subsystem. ⚙️
+* **Algorithm Validation:** I verified the system's support for NIST-standardized algorithms, specifically **ML-KEM-768** (for key encapsulation) and **ML-DSA-65** (for digital signatures), by filtering the OpenSSL algorithm list and provider status. 🔍
+
+---
+
+## Phase I: Bare-Metal Infrastructure & Host Layer
+
+### Dedicated Infrastructure Host
+* **Hardware:** Dell Latitude E5570 (Intel Core i7-6820HQ)
+* **Memory:** 24.0 GiB DDR4
+* **Primary Storage:** 1TB Western Digital SATA SSD
+* **OS:** RHEL 9 (Registered Bare-Metal)
+
+---
+
+## Phase II: Post-Quantum Security & Identity Layer
+
+### PQC Identity Generation
+I established a future-proof identity layer by provisioning the following artifacts:
+1.  **ML-KEM-768 Handshake Key:** Established for secure, quantum-resistant key exchange.
+2.  **ML-DSA-65 Signature Key:** Provisioned for high-integrity digital signatures.
+3.  **X.509 Certificate:** A self-signed certificate for `lfcs-hypervisor.local` utilizing a 7.4K lattice-based signature.
+
+### Repository Hardening
+I implemented a strict "No Secrets" policy for this public portfolio:
+* **Credential Protection:** `.gitignore` utilizes wildcard patterns (`*.key`) to ensure private material is never staged.
+* **SELinux Policy:** Custom service directories are secured with the appropriate mandatory access control contexts.
